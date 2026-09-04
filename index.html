@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel de gestión · Sitio web INCOSAF</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@600;700&family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0E2247;
+  --navy-deep:#081630;
+  --gold:#FFC913;
+  --gold-soft:#F2B705;
+  --paper:#F8F7F2;
+  --ink:#1B2233;
+  --line:rgba(14,34,71,.14);
+  --danger:#b8322f;
+  --ok:#1f7a4d;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Public Sans',system-ui,sans-serif;color:var(--ink);background:var(--paper);line-height:1.55}
+h1,h2,h3{font-family:'Zilla Slab',serif}
+button,input,textarea{font-family:inherit}
+
+/* ---------- Login ---------- */
+.lock{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,var(--navy) 0%,var(--navy-deep) 70%);padding:1.25rem}
+.lock-card{background:#fff;border-radius:14px;max-width:380px;width:100%;padding:2.2rem 2rem;box-shadow:0 30px 80px rgba(0,0,0,.4);text-align:center}
+.lock-card .eyebrow{display:block;font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;font-weight:800;color:var(--gold-soft);margin-bottom:.4rem}
+.lock-card h1{font-size:1.4rem;color:var(--navy);margin-bottom:.3rem}
+.lock-card p.sub{font-size:.85rem;color:#5a6480;margin-bottom:1.6rem}
+.field{margin-bottom:1.1rem;text-align:left}
+.field label{display:block;font-size:.8rem;font-weight:700;color:var(--navy);margin-bottom:.35rem}
+.field input{width:100%;padding:.75rem .9rem;border:1.5px solid var(--line);border-radius:8px;font-size:.95rem}
+.field input:focus{outline:2px solid var(--gold);border-color:var(--gold-soft)}
+.btn{display:inline-block;width:100%;padding:.85rem 1.4rem;border-radius:8px;font-weight:800;font-size:.95rem;border:none;cursor:pointer}
+.btn-gold{background:var(--gold);color:var(--navy-deep)}
+.btn-gold:hover{background:#ffd84d}
+.btn-gold:disabled{opacity:.6;cursor:default}
+.lock-error{margin-top:1rem;font-size:.85rem;color:var(--danger);background:#fbe9e8;border:1px solid #f2c8c6;border-radius:8px;padding:.6rem;display:none}
+.lock-error.show{display:block}
+
+/* ---------- App ---------- */
+#app{display:none}
+header.bar{background:var(--navy);color:#fff;padding:.9rem 1.25rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap;position:sticky;top:0;z-index:10}
+header.bar h1{font-size:1.15rem}
+header.bar .who{margin-left:auto;font-size:.85rem;opacity:.85;display:flex;align-items:center;gap:.8rem}
+.btn-ghost{background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.3);padding:.45rem .9rem;border-radius:6px;font-size:.82rem;font-weight:700;cursor:pointer}
+.btn-ghost:hover{background:rgba(255,255,255,.24)}
+
+.tabs{max-width:900px;margin:1.5rem auto 0;padding:0 1.25rem;display:flex;gap:.6rem}
+.tab-btn{background:#fff;border:1.5px solid var(--line);border-radius:8px;padding:.6rem 1.1rem;font-size:.88rem;font-weight:700;color:var(--navy);cursor:pointer}
+.tab-btn.active{background:var(--navy);border-color:var(--navy);color:var(--gold)}
+
+main{max-width:900px;margin:0 auto;padding:1.25rem}
+.card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:1.4rem;margin-bottom:1.4rem;box-shadow:0 6px 18px rgba(8,22,48,.06)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.field.full{grid-column:1/-1}
+textarea{width:100%;padding:.75rem .9rem;border:1.5px solid var(--line);border-radius:8px;font-size:.95rem;resize:vertical;min-height:100px}
+textarea:focus{outline:2px solid var(--gold);border-color:var(--gold-soft)}
+.helptext{font-size:.76rem;color:#5a6480;margin-top:.3rem;text-align:right}
+input[type=file]{width:100%;font-size:.88rem}
+.form-actions{display:flex;justify-content:flex-end;gap:.7rem;margin-top:.4rem}
+.btn-line,.btn-primary{padding:.7rem 1.2rem;border-radius:8px;font-weight:700;font-size:.88rem;cursor:pointer;width:auto;border:1.5px solid var(--line)}
+.btn-line{background:#fff;color:var(--navy)}
+.btn-line:hover{border-color:var(--gold-soft)}
+.btn-primary{background:var(--navy);color:#fff;border-color:var(--navy)}
+.btn-primary:hover{background:var(--navy-deep);border-color:var(--navy-deep)}
+.btn-primary:disabled{opacity:.6;cursor:default}
+
+.noticia-item{margin-bottom:1rem}
+.noticia-item-head{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem}
+.noticia-item-head strong{color:var(--navy);font-size:1.02rem}
+.noticia-item img{width:100%;max-width:320px;border-radius:8px;margin:.7rem 0;display:block;object-fit:cover}
+.noticia-item p{margin-top:.4rem;font-size:.92rem;white-space:pre-wrap}
+.del-btn{background:#fff;border:1.5px solid #f2c8c6;color:var(--danger);padding:.4rem .8rem;border-radius:6px;font-size:.78rem;font-weight:700;cursor:pointer;flex:none}
+.del-btn:hover{background:#fbe9e8}
+
+.photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.photo-card{position:relative;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fff}
+.photo-card img{width:100%;height:110px;object-fit:cover;display:block}
+.photo-card button{position:absolute;top:6px;right:6px;background:rgba(184,50,47,.92);color:#fff;border:none;border-radius:6px;padding:4px 7px;font-size:12px;cursor:pointer}
+
+.empty-note{font-size:.88rem;color:#5a6480;text-align:center;padding:1rem 0}
+.toast{position:fixed;left:50%;bottom:1.5rem;transform:translate(-50%,20px);background:var(--navy);color:#fff;padding:.7rem 1.2rem;border-radius:8px;font-size:.88rem;opacity:0;pointer-events:none;transition:.25s;z-index:50}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+@media(max-width:640px){.grid2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- ---------- Pantalla de acceso ---------- -->
+<div class="lock" id="lockScreen">
+  <div class="lock-card">
+    <span class="eyebrow">INCOSAF · San Fernando</span>
+    <h1>Panel de gestión</h1>
+    <p class="sub">Sitio web público — noticias y fotos</p>
+    <form id="loginForm">
+      <div class="field">
+        <label for="loginEmail">Correo</label>
+        <input type="email" id="loginEmail" autocomplete="username" required>
+      </div>
+      <div class="field">
+        <label for="loginPass">Contraseña</label>
+        <input type="password" id="loginPass" autocomplete="current-password" required>
+      </div>
+      <button type="submit" class="btn btn-gold" id="loginBtn">Ingresar</button>
+    </form>
+    <div class="lock-error" id="loginError">Correo o contraseña incorrectos.</div>
+  </div>
+</div>
+
+<!-- ---------- App ---------- -->
+<div id="app">
+  <header class="bar">
+    <h1>Panel de gestión · Sitio web</h1>
+    <div class="who">
+      <span id="whoLabel"></span>
+      <button class="btn-ghost" id="logoutBtn">Cerrar sesión</button>
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab-btn active" data-tab="noticias">Noticias</button>
+    <button class="tab-btn" data-tab="fotos">Fotos de portada</button>
+  </nav>
+
+  <main>
+    <!-- Noticias -->
+    <section id="tab-noticias">
+      <div class="card">
+        <h2 style="font-size:1.1rem;color:var(--navy);margin-bottom:1rem">Publicar noticia</h2>
+        <form id="noticiaForm">
+          <div class="grid2">
+            <div class="field full">
+              <label for="notTitulo">Título</label>
+              <input type="text" id="notTitulo" maxlength="120" required>
+            </div>
+            <div class="field">
+              <label for="notFecha">Fecha</label>
+              <input type="date" id="notFecha" required>
+            </div>
+            <div class="field">
+              <label for="notImagen">Foto (opcional)</label>
+              <input type="file" id="notImagen" accept="image/*">
+            </div>
+            <div class="field full">
+              <label for="notTexto">Texto</label>
+              <textarea id="notTexto" maxlength="1200" required placeholder="Contenido de la noticia"></textarea>
+              <div class="helptext"><span id="notTextoCount">0</span>/1200 caracteres</div>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn-line" id="noticiaResetBtn">Limpiar</button>
+            <button type="submit" class="btn-primary" id="noticiaSubmitBtn">Publicar noticia</button>
+          </div>
+        </form>
+      </div>
+      <div id="noticiasLista"></div>
+      <p class="empty-note" id="noticiasEmpty" style="display:none">Aún no hay noticias publicadas.</p>
+    </section>
+
+    <!-- Fotos -->
+    <section id="tab-fotos" style="display:none">
+      <div class="card">
+        <h2 style="font-size:1.1rem;color:var(--navy);margin-bottom:1rem">Subir foto</h2>
+        <form id="fotoForm">
+          <div class="field full">
+            <label for="fotoImagen">Foto</label>
+            <input type="file" id="fotoImagen" accept="image/*" required>
+          </div>
+          <div class="field full">
+            <label for="fotoAlt">Descripción (opcional, para accesibilidad)</label>
+            <input type="text" id="fotoAlt" maxlength="160" placeholder="Ej: Estudiantes en salida a terreno">
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn-primary" id="fotoSubmitBtn">Subir foto</button>
+          </div>
+        </form>
+      </div>
+      <div id="fotosGrid" class="photo-grid"></div>
+      <p class="empty-note" id="fotosEmpty" style="display:none">Aún no hay fotos subidas.</p>
+    </section>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+import {
+  getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+import {
+  getFirestore, collection, addDoc, deleteDoc, doc,
+  onSnapshot, query, orderBy, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+// ---------- Configuración de Firebase (proyecto incosaf-web-panel) ----------
+const firebaseConfig = {
+  apiKey: "AIzaSyDrgpo2idgpGyqvebmSvuq50DjkKTdrxsA",
+  authDomain: "incosaf-web-panel.firebaseapp.com",
+  projectId: "incosaf-web-panel",
+  storageBucket: "incosaf-web-panel.firebasestorage.app",
+  messagingSenderId: "829646227803",
+  appId: "1:829646227803:web:942a204e3ce5ad08f2f27e"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let noticias = [];
+let fotos = [];
+
+// ---------- Utilidades ----------
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(()=>t.classList.remove('show'), 2600);
+}
+function escapeHtml(s){
+  return (s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function fmtDate(iso){
+  if(!iso) return '—';
+  const [y,m,d] = iso.split('-');
+  return `${d}-${m}-${y}`;
+}
+
+// Las fotos se guardan directamente en Firestore como imagen codificada
+// (sin usar Firebase Storage), redimensionadas y comprimidas en el
+// navegador para quedar bien por debajo del límite de 1 MB por documento.
+function comprimirImagen(file, maxDim=1400, calidadInicial=0.75){
+  return new Promise((resolve, reject)=>{
+    const reader = new FileReader();
+    reader.onerror = ()=>reject(new Error('No se pudo leer el archivo.'));
+    reader.onload = ()=>{
+      const img = new Image();
+      img.onerror = ()=>reject(new Error('El archivo no es una imagen válida.'));
+      img.onload = ()=>{
+        let w = img.width, h = img.height;
+        if(w > maxDim || h > maxDim){
+          const escala = maxDim / Math.max(w, h);
+          w = Math.round(w*escala); h = Math.round(h*escala);
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        let calidad = calidadInicial;
+        let dataUrl = canvas.toDataURL('image/jpeg', calidad);
+        while(dataUrl.length > 900000 && calidad > 0.35){
+          calidad -= 0.15;
+          dataUrl = canvas.toDataURL('image/jpeg', calidad);
+        }
+        if(dataUrl.length > 900000){
+          reject(new Error('La foto sigue siendo muy pesada incluso comprimida. Prueba con otra imagen.'));
+          return;
+        }
+        resolve(dataUrl);
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+// ---------- Noticias ----------
+function watchNoticias(){
+  const q = query(collection(db,'noticias'), orderBy('creadoEn','desc'));
+  onSnapshot(q, snap=>{
+    noticias = snap.docs.map(d=>({ id:d.id, ...d.data() }));
+    renderNoticias();
+  }, err=>{
+    console.error(err);
+    showToast('No se pudieron cargar las noticias.');
+  });
+}
+function renderNoticias(){
+  const cont = document.getElementById('noticiasLista');
+  const empty = document.getElementById('noticiasEmpty');
+  empty.style.display = noticias.length ? 'none' : '';
+  cont.innerHTML = noticias.map(n=>`
+    <div class="card noticia-item">
+      <div class="noticia-item-head">
+        <div>
+          <strong>${escapeHtml(n.titulo||'—')}</strong><br>
+          <span class="helptext" style="text-align:left;display:block">${fmtDate(n.fecha)}</span>
+        </div>
+        <button type="button" class="del-btn" onclick="window.__eliminarNoticia('${n.id}')">🗑 Eliminar</button>
+      </div>
+      ${n.imagenBase64 ? `<img src="${n.imagenBase64}" alt="">` : ''}
+      <p>${escapeHtml(n.texto||'')}</p>
+    </div>
+  `).join('');
+}
+async function eliminarNoticia(id){
+  if(!confirm('¿Eliminar esta noticia? Esta acción no se puede deshacer.')) return;
+  try{
+    await deleteDoc(doc(db,'noticias', id));
+    showToast('Noticia eliminada.');
+  }catch(err){
+    console.error(err);
+    showToast('No se pudo eliminar. Intente nuevamente.');
+  }
+}
+window.__eliminarNoticia = eliminarNoticia;
+
+// ---------- Fotos ----------
+function watchFotos(){
+  const q = query(collection(db,'fotos'), orderBy('creadoEn','desc'));
+  onSnapshot(q, snap=>{
+    fotos = snap.docs.map(d=>({ id:d.id, ...d.data() }));
+    renderFotos();
+  }, err=>{
+    console.error(err);
+    showToast('No se pudieron cargar las fotos.');
+  });
+}
+function renderFotos(){
+  const cont = document.getElementById('fotosGrid');
+  const empty = document.getElementById('fotosEmpty');
+  empty.style.display = fotos.length ? 'none' : '';
+  cont.innerHTML = fotos.map(f=>`
+    <div class="photo-card">
+      <img src="${f.imagenBase64}" alt="${escapeHtml(f.alt||'')}">
+      <button type="button" onclick="window.__eliminarFoto('${f.id}')" aria-label="Eliminar foto">🗑</button>
+    </div>
+  `).join('');
+}
+async function eliminarFoto(id){
+  if(!confirm('¿Eliminar esta foto? Esta acción no se puede deshacer.')) return;
+  try{
+    await deleteDoc(doc(db,'fotos', id));
+    showToast('Foto eliminada.');
+  }catch(err){
+    console.error(err);
+    showToast('No se pudo eliminar. Intente nuevamente.');
+  }
+}
+window.__eliminarFoto = eliminarFoto;
+
+// ---------- Formularios ----------
+document.getElementById('notFecha').valueAsDate = new Date();
+document.getElementById('notTexto').addEventListener('input', e=>{
+  document.getElementById('notTextoCount').textContent = e.target.value.length;
+});
+document.getElementById('noticiaResetBtn').addEventListener('click', ()=>{
+  document.getElementById('noticiaForm').reset();
+  document.getElementById('notFecha').valueAsDate = new Date();
+  document.getElementById('notTextoCount').textContent = '0';
+});
+document.getElementById('noticiaForm').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const titulo = document.getElementById('notTitulo').value.trim();
+  const fecha = document.getElementById('notFecha').value;
+  const texto = document.getElementById('notTexto').value.trim();
+  const fileInput = document.getElementById('notImagen');
+  if(!titulo || !fecha || !texto) return;
+  const btn = document.getElementById('noticiaSubmitBtn');
+  btn.disabled = true;
+  try{
+    let imagenBase64 = null;
+    if(fileInput.files[0]) imagenBase64 = await comprimirImagen(fileInput.files[0]);
+    await addDoc(collection(db,'noticias'), {
+      titulo, fecha, texto, imagenBase64,
+      creadoEn: serverTimestamp()
+    });
+    showToast('Noticia publicada.');
+    e.target.reset();
+    document.getElementById('notFecha').valueAsDate = new Date();
+    document.getElementById('notTextoCount').textContent = '0';
+  }catch(err){
+    console.error(err);
+    showToast(err.message || 'No se pudo publicar la noticia.');
+  }finally{
+    btn.disabled = false;
+  }
+});
+
+document.getElementById('fotoForm').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const fileInput = document.getElementById('fotoImagen');
+  const alt = document.getElementById('fotoAlt').value.trim();
+  if(!fileInput.files[0]) return;
+  const btn = document.getElementById('fotoSubmitBtn');
+  btn.disabled = true;
+  try{
+    const imagenBase64 = await comprimirImagen(fileInput.files[0]);
+    await addDoc(collection(db,'fotos'), {
+      imagenBase64, alt,
+      creadoEn: serverTimestamp()
+    });
+    showToast('Foto subida.');
+    e.target.reset();
+  }catch(err){
+    console.error(err);
+    showToast(err.message || 'No se pudo subir la foto.');
+  }finally{
+    btn.disabled = false;
+  }
+});
+
+// ---------- Tabs ----------
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-noticias').style.display = btn.dataset.tab==='noticias' ? '' : 'none';
+    document.getElementById('tab-fotos').style.display = btn.dataset.tab==='fotos' ? '' : 'none';
+  });
+});
+
+// ---------- Login ----------
+const lockScreen = document.getElementById('lockScreen');
+const appEl = document.getElementById('app');
+const loginError = document.getElementById('loginError');
+
+document.getElementById('loginForm').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass = document.getElementById('loginPass').value;
+  const btn = document.getElementById('loginBtn');
+  btn.disabled = true;
+  loginError.classList.remove('show');
+  try{
+    await signInWithEmailAndPassword(auth, email, pass);
+  }catch(err){
+    console.error(err);
+    loginError.classList.add('show');
+  }finally{
+    btn.disabled = false;
+  }
+});
+
+document.getElementById('logoutBtn').addEventListener('click', ()=> signOut(auth));
+
+let watchersStarted = false;
+onAuthStateChanged(auth, user=>{
+  if(user){
+    lockScreen.style.display = 'none';
+    appEl.style.display = 'block';
+    document.getElementById('whoLabel').textContent = user.email;
+    if(!watchersStarted){
+      watchersStarted = true;
+      watchNoticias();
+      watchFotos();
+    }
+  }else{
+    appEl.style.display = 'none';
+    lockScreen.style.display = 'flex';
+    document.getElementById('loginPass').value = '';
+  }
+});
+</script>
+</body>
+</html>
